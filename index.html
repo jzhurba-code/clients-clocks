@@ -1,0 +1,369 @@
+<title>Часы клиентов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: фирменный стиль Бюро Сучкова. Слева заголовок, большие часы и список по поясам, справа колонка серых скруглённых карточек (сводка и настройки). Тёмная тема: синий фон и белые карточки, как в меню сайта. */
+:root {
+  --bg: #FFFFFF;
+  --fg: #0B0B0B;
+  --muted: #6F6F6F;
+  --ghost: #B8B8B8;
+  --hero-clock: #0525C6;
+  --logo: #0525C6;
+  --brand: #0525C6;
+  --coral: #D9442C;
+  --card: #F1F1F1;
+  --card-fg: #0B0B0B;
+  --card-muted: #6F6F6F;
+  --card-line: #DCDCDC;
+  --field: #FFFFFF;
+  --pill-off-bg: #E2E2E2;
+  --pill-off-fg: #5C5C5C;
+  --font: "Mulish", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0525C6;
+    --fg: #FFFFFF;
+    --muted: #BDBDF7;
+    --ghost: #7C7CE8;
+    --hero-clock: #FFFFFF;
+    --logo: #FFFFFF;
+    --card: #FFFFFF;
+    --field: #F1F1F1;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0525C6;
+  --fg: #FFFFFF;
+  --muted: #BDBDF7;
+  --ghost: #7C7CE8;
+  --hero-clock: #FFFFFF;
+  --logo: #FFFFFF;
+  --card: #FFFFFF;
+  --field: #F1F1F1;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.4;
+  padding-inline: 16px;
+  padding-block: 20px 48px;
+  font-variant-numeric: tabular-nums;
+}
+.wrap { max-width: 1180px; margin-inline: auto; display: flex; flex-direction: column; gap: 40px; }
+
+/* Шапка */
+.brand { display: flex; align-items: center; gap: 28px; }
+.brand svg { width: 56px; height: 56px; flex: none; display: block; }
+.logo-full { height: 52px; width: auto; max-width: 100%; display: block; }
+:root[data-theme="dark"] .logo-full { filter: brightness(0) invert(1); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .logo-full { filter: brightness(0) invert(1); } }
+.brand-name { color: var(--hero-clock); font-weight: 600; font-size: 17px; }
+:root[data-theme="dark"] .brand-name { color: var(--fg); }
+
+.hero { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.hero h1 {
+  margin: 0; font-weight: 800; letter-spacing: -0.02em; line-height: 1.02;
+  font-size: clamp(34px, 6.5vw, 76px); color: var(--ghost); text-wrap: balance;
+}
+.hero h1 b { color: var(--fg); font-weight: 800; }
+.me-label { color: var(--muted); font-size: 15px; font-weight: 600; margin-top: 14px; }
+.me-clock {
+  font-weight: 800; letter-spacing: -0.03em; line-height: 1;
+  font-size: clamp(54px, 13vw, 132px); color: var(--hero-clock);
+}
+.me-date { color: var(--muted); font-size: 17px; font-weight: 600; margin-top: 4px; }
+
+/* Две колонки */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; align-items: start; }
+.side { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; gap: 10px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); }
+.main { grid-column: 1; grid-row: 1; min-width: 0; }
+
+.card { background: var(--card); color: var(--card-fg); border-radius: 28px; padding: 20px 22px; }
+.card-label { color: var(--card-fg); font-size: 15px; font-weight: 600; }
+.sum-num { color: var(--brand); font-weight: 800; letter-spacing: -0.03em; font-size: 56px; line-height: 1.05; margin-top: 20px; }
+.sum-num span { color: var(--card-muted); font-size: 24px; font-weight: 700; letter-spacing: 0; }
+.sum-sub { color: var(--card-muted); font-size: 14px; margin-top: 4px; }
+
+.field-row { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.field-row label { color: var(--card-muted); font-size: 14px; min-width: 24px; }
+input[type="time"] {
+  font: inherit; font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums;
+  background: var(--field); color: var(--card-fg);
+  border: 0; border-radius: 999px; padding: 8px 16px;
+}
+.check { display: flex; align-items: center; gap: 10px; cursor: pointer; margin-top: 18px; font-size: 14px; line-height: 1.3; }
+.check input { width: 18px; height: 18px; accent-color: var(--brand); flex: none; }
+input:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.hint { color: var(--coral); font-size: 13px; margin-top: 10px; }
+
+/* Список */
+.board { display: flex; flex-direction: column; gap: 36px; }
+.grp-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.grp-title { font-weight: 800; font-size: clamp(24px, 3.4vw, 36px); letter-spacing: -0.02em; line-height: 1.1; }
+.grp-pill {
+  font-size: 13px; font-weight: 600; color: var(--muted);
+  border: 1px solid currentColor; border-radius: 999px; padding: 2px 12px;
+}
+.rows { background: var(--card); color: var(--card-fg); border-radius: 28px; overflow: hidden; }
+.row {
+  display: grid; grid-template-columns: minmax(0, 1.5fr) auto minmax(0, 1.25fr);
+  gap: 8px 24px; align-items: center; padding: 18px 24px;
+}
+.row + .row { border-top: 1px solid var(--card-line); }
+.row[hidden] { display: none; }
+.who { min-width: 0; }
+.client { font-weight: 700; font-size: 20px; line-height: 1.2; overflow-wrap: anywhere; }
+.city { color: var(--card-muted); font-size: 14px; margin-top: 2px; }
+.time { text-align: right; }
+.clock { font-weight: 800; font-size: 28px; letter-spacing: -0.02em; line-height: 1.05; }
+.date { color: var(--card-muted); font-size: 13px; margin-top: 3px; }
+.status { display: flex; flex-direction: column; gap: 5px; align-items: flex-start; min-width: 0; }
+.pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 700; padding: 5px 14px 5px 10px; border-radius: 999px;
+}
+.pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: none; }
+.pill.ok { color: #FFFFFF; background: var(--brand); }
+.pill.warn { color: #FFFFFF; background: var(--coral); }
+.pill.off { color: var(--pill-off-fg); background: var(--pill-off-bg); }
+.pill.off::before { background: transparent; box-shadow: inset 0 0 0 2px currentColor; }
+.sub { color: var(--card-muted); font-size: 13px; padding-left: 4px; }
+
+.empty { color: var(--muted); padding: 24px 0; font-weight: 600; }
+.foot { color: var(--muted); font-size: 13px; max-width: 65ch; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .side { grid-column: 1; grid-row: 1; position: static; }
+  .main { grid-column: 1; grid-row: 2; }
+}
+@media (max-width: 600px) {
+  .row { grid-template-columns: minmax(0, 1fr) auto; padding: 16px 18px; }
+  .status { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+  .sub { padding-left: 0; }
+  .card { border-radius: 24px; }
+  .rows { border-radius: 24px; }
+}
+</style>
+
+<div class="wrap">
+  <header class="brand">
+    <img class="logo-full" src="data:image/png;base64,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" width="244" height="78" alt="Бюро Сучкова">
+  </header>
+
+  <section class="hero" aria-label="Ваше время">
+    <h1>Часы клиентов: <b>где сейчас рабочий день</b></h1>
+    <div class="me-label">ваше время · Санкт-Петербург · МСК</div>
+    <div class="me-clock" id="meClock">--:--:--</div>
+    <div class="me-date" id="meDate"></div>
+  </section>
+
+  <div class="layout">
+    <aside class="side" aria-label="Сводка и настройки">
+      <div class="card">
+        <div class="card-label">на связи сейчас</div>
+        <div class="sum-num" id="sumNum">–</div>
+        <div class="sum-sub">клиентов в рабочем времени</div>
+      </div>
+      <div class="card">
+        <div class="card-label">рабочий день клиентов</div>
+        <div class="field-row">
+          <label for="startTime">с</label>
+          <input type="time" id="startTime" value="09:00">
+          <label for="endTime">до</label>
+          <input type="time" id="endTime" value="18:00">
+        </div>
+        <label class="check" for="onlyWorking">
+          <input type="checkbox" id="onlyWorking">
+          показать только тех, кто на связи
+        </label>
+        <div class="hint" id="hint" hidden>Конец дня должен быть позже начала. Пока действуют 09:00–18:00.</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="board" id="board" aria-label="Клиенты по разнице во времени"></div>
+      <div class="empty" id="empty" hidden>Сейчас никто из клиентов не в рабочем времени.</div>
+    </main>
+  </div>
+
+  <footer class="foot">
+    Рабочее время считается по местному времени клиента, с понедельника по пятницу. Пояса заданы фиксированно: в России нет перехода на летнее время, Астана живёт по GMT+5. Часы не зависят от настроек времени на вашем устройстве.
+  </footer>
+</div>
+
+<script>
+(function () {
+  var ME_OFFSET = 3;
+  var CLIENTS = [
+    { name: "Лисино / Унистрой", city: "Санкт-Петербург", off: 3 },
+    { name: "Яр Парк", city: "Казань", off: 3 },
+    { name: "MN GROUP", city: "Ульяновск", off: 4 },
+    { name: "Баланс Тауэрс", city: "Самара", off: 4 },
+    { name: "ЗИМ Галерея", city: "Самара", off: 4 },
+    { name: "ПИПЛ", city: "Астрахань", off: 4 },
+    { name: "ГК Кронверк", city: "Саратов", off: 4 },
+    { name: "Атлас Девелопмент", city: "Екатеринбург", off: 5 },
+    { name: "NAK", city: "Астана, Казахстан", off: 5 },
+    { name: "ГК ТАК", city: "Новосибирск", off: 7 },
+    { name: "Пулковский", city: "Иркутск", off: 8 },
+    { name: "Смартаменты", city: "Иркутск", off: 8 },
+    { name: "ЖК на Кузьмихе", city: "Иркутск", off: 8 }
+  ];
+  var DAYS = ["вс", "пн", "вт", "ср", "чт", "пт", "сб"];
+  var MONTHS = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+  var DAYS_FULL = ["воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"];
+  var SOON = 60;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var startEl = $("startTime"), endEl = $("endTime"), onlyEl = $("onlyWorking"), hintEl = $("hint");
+
+  var cfg = { start: "09:00", end: "18:00", only: false };
+  try {
+    var saved = JSON.parse(localStorage.getItem("clients-clock") || "null");
+    if (saved) { cfg.start = saved.start || cfg.start; cfg.end = saved.end || cfg.end; cfg.only = !!saved.only; }
+  } catch (e) {}
+  startEl.value = cfg.start; endEl.value = cfg.end; onlyEl.checked = cfg.only;
+
+  function save() {
+    try { localStorage.setItem("clients-clock", JSON.stringify(cfg)); } catch (e) {}
+  }
+  function toMin(v) {
+    var p = String(v).split(":");
+    return parseInt(p[0], 10) * 60 + parseInt(p[1], 10);
+  }
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+  function fmtDur(min) {
+    var h = Math.floor(min / 60), m = min % 60;
+    return h > 0 ? h + " ч " + m + " м" : m + " м";
+  }
+  function ahead(v) {
+    return v === 1 ? "На 1 час впереди" : "На " + v + (v < 5 ? " часа" : " часов") + " впереди";
+  }
+
+  var board = $("board");
+  var groups = {};
+  var order = [];
+  CLIENTS.forEach(function (c) {
+    if (!groups[c.off]) { groups[c.off] = []; order.push(c.off); }
+    groups[c.off].push(c);
+  });
+  order.sort(function (a, b) { return a - b; });
+
+  var rows = [];
+  var groupEls = [];
+  order.forEach(function (off) {
+    var diff = off - ME_OFFSET;
+    var sec = document.createElement("section");
+    var head = document.createElement("div");
+    head.className = "grp-head";
+    head.innerHTML = '<span class="grp-title">' + (diff === 0 ? "Как у вас" : ahead(diff)) + '</span><span class="grp-pill">GMT+' + off + '</span>';
+    var list = document.createElement("div");
+    list.className = "rows";
+    groups[off].forEach(function (c) {
+      var r = document.createElement("div");
+      r.className = "row";
+      r.innerHTML =
+        '<div class="who"><div class="client"></div><div class="city"></div></div>' +
+        '<div class="time"><div class="clock">--:--:--</div><div class="date"></div></div>' +
+        '<div class="status"><span class="pill off"></span><span class="sub"></span></div>';
+      r.querySelector(".client").textContent = c.name;
+      r.querySelector(".city").textContent = c.city;
+      list.appendChild(r);
+      rows.push({ c: c, el: r, clock: r.querySelector(".clock"), date: r.querySelector(".date"), pill: r.querySelector(".pill"), sub: r.querySelector(".sub") });
+    });
+    sec.appendChild(head);
+    sec.appendChild(list);
+    board.appendChild(sec);
+    groupEls.push({ sec: sec, off: off });
+  });
+
+  function getHours() {
+    var s = toMin(cfg.start), e = toMin(cfg.end);
+    if (isNaN(s) || isNaN(e) || e <= s) { hintEl.hidden = false; return { s: 540, e: 1080 }; }
+    hintEl.hidden = true;
+    return { s: s, e: e };
+  }
+
+  function nextOpen(dow, mins, s) {
+    for (var k = 0; k <= 7; k++) {
+      var d = (dow + k) % 7;
+      if (d >= 1 && d <= 5 && (k > 0 || mins < s)) {
+        return { wait: k * 1440 + s - mins, day: d };
+      }
+    }
+    return { wait: 0, day: 1 };
+  }
+
+  function hhmm(min) { return pad(Math.floor(min / 60)) + ":" + pad(min % 60); }
+
+  function tick() {
+    var now = Date.now();
+    var hrs = getHours();
+    var my = new Date(now + ME_OFFSET * 3600000);
+    $("meClock").textContent = pad(my.getUTCHours()) + ":" + pad(my.getUTCMinutes()) + ":" + pad(my.getUTCSeconds());
+    $("meDate").textContent = DAYS_FULL[my.getUTCDay()] + ", " + my.getUTCDate() + " " + MONTHS[my.getUTCMonth()];
+    var myDay = my.getUTCDate();
+
+    rows.forEach(function (r) {
+      var d = new Date(now + r.c.off * 3600000);
+      var h = d.getUTCHours(), m = d.getUTCMinutes(), s = d.getUTCSeconds();
+      var dow = d.getUTCDay();
+      var mins = h * 60 + m;
+      r.clock.textContent = pad(h) + ":" + pad(m) + ":" + pad(s);
+      var dateText = DAYS[dow] + ", " + d.getUTCDate() + " " + MONTHS[d.getUTCMonth()];
+      if (d.getUTCDate() !== myDay) dateText += " · уже другая дата";
+      r.date.textContent = dateText;
+
+      var weekday = dow >= 1 && dow <= 5;
+      var cls, label, sub, working = false;
+      if (weekday && mins >= hrs.s && mins < hrs.e) {
+        var left = hrs.e - mins;
+        working = true;
+        if (left <= SOON) { cls = "warn"; label = "Скоро конец дня"; }
+        else { cls = "ok"; label = "Рабочее время"; }
+        sub = "ещё " + fmtDur(left) + " до " + hhmm(hrs.e);
+      } else {
+        var n = nextOpen(dow, mins, hrs.s);
+        if (weekday && mins < hrs.s && n.wait <= SOON) { cls = "warn"; label = "Скоро начало дня"; }
+        else { cls = "off"; label = weekday ? "Нерабочее время" : "Выходной"; }
+        sub = n.wait < 720
+          ? "начнётся через " + fmtDur(n.wait)
+          : "начнётся в " + DAYS[n.day] + " в " + hhmm(hrs.s);
+      }
+      r.pill.className = "pill " + cls;
+      r.pill.textContent = label;
+      r.sub.textContent = sub;
+      r.el.dataset.working = working ? "1" : "0";
+    });
+
+    var count = 0;
+    rows.forEach(function (r) {
+      var isWorking = r.el.dataset.working === "1";
+      if (isWorking) count++;
+      r.el.hidden = cfg.only && !isWorking;
+    });
+    $("sumNum").innerHTML = count + '<span> из ' + rows.length + '</span>';
+    groupEls.forEach(function (g) {
+      g.sec.hidden = !g.sec.querySelector(".row:not([hidden])");
+    });
+    $("empty").hidden = !(cfg.only && count === 0);
+  }
+
+  startEl.addEventListener("change", function () { cfg.start = startEl.value || "09:00"; save(); tick(); });
+  endEl.addEventListener("change", function () { cfg.end = endEl.value || "18:00"; save(); tick(); });
+  onlyEl.addEventListener("change", function () { cfg.only = onlyEl.checked; save(); tick(); });
+
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
